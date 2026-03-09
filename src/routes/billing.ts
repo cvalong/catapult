@@ -4,10 +4,25 @@ import { eq } from 'drizzle-orm'
 import { stripe } from '../lib/stripe.js'
 import { requireAuth } from '../lib/auth-middleware.js'
 import { db } from '../db/index.js'
-import { user } from '../db/schema.js'
+import { user, licenses } from '../db/schema.js'
+import { generateKey } from '../lib/license.js'
+import { sendEmail } from '../lib/email.js'
 
 const billing = new Hono()
 
+// Kit purchase — no auth required, Stripe collects the buyer's email
+billing.post('/kit-checkout', async (ctx) => {
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    line_items: [{ price: process.env.STRIPE_KIT_PRICE_ID!, quantity: 1 }],
+    success_url: `${process.env.BETTER_AUTH_URL}/success`,
+    cancel_url: `${process.env.BETTER_AUTH_URL}/`,
+  })
+
+  return ctx.json({ url: session.url })
+})
+
+// Subscription checkout — requires auth
 billing.post('/checkout', requireAuth, async (ctx) => {
   const currentUser = ctx.get('user')
 
@@ -62,6 +77,33 @@ billing.post('/webhook', async (ctx) => {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
+
+      if (session.mode === 'payment') {
+        // Kit purchase — mint and deliver a license key
+        const email = session.customer_details?.email
+        if (email) {
+          const key = generateKey()
+          await db.insert(licenses).values({
+            id: crypto.randomUUID(),
+            key,
+            email,
+            createdAt: new Date(),
+          })
+          await sendEmail({
+            to: email,
+            subject: 'Your Catapult license key',
+            html: `
+              <p>Thanks for purchasing Catapult!</p>
+              <p>Your license key is:</p>
+              <p><strong>${key}</strong></p>
+              <p>Run <code>npm create catapult@latest</code> and enter this key when prompted.</p>
+            `,
+          })
+        }
+        break
+      }
+
+      // Subscription purchase — update the user's subscription status
       const customerId = session.customer as string
       await db
         .update(user)
