@@ -19,11 +19,7 @@ Use `gh pr create` — GitHub will automatically populate the editor with `.gith
 gh pr create
 ```
 
-To skip the interactive editor and pass a title/body directly:
-
-```sh
-gh pr create --title "your title" --body "$(cat .github/pull_request_template.md)"
-```
+Fill in the template in your editor, save, and exit to submit. Avoid passing `--body` directly as it will post the template unfilled.
 
 ## Commit Messages
 - Do not add `Co-Authored-By: Claude` or any AI attribution lines to commits.
