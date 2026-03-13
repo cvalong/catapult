@@ -6,12 +6,16 @@ import { http, HttpResponse } from 'msw'
 import { server } from '@/test/server'
 import { AccountPage } from './_auth.account'
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
-  useNavigate: () => vi.fn(),
-}))
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+      <a href={to}>{children}</a>
+    ),
+    useNavigate: () => vi.fn(),
+  }
+})
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -39,7 +43,7 @@ function renderWithQuery(ui: React.ReactElement) {
 describe('AccountPage', () => {
   it('renders user name and email', () => {
     renderWithQuery(<AccountPage />)
-    expect(screen.getByText('Alice')).toBeInTheDocument()
+    expect(screen.getAllByText('Alice')[0]).toBeInTheDocument()
     expect(screen.getByText('alice@example.com')).toBeInTheDocument()
   })
 

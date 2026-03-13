@@ -2,12 +2,16 @@ import { render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
 import { DashboardPage } from './_auth.index'
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
-  useNavigate: () => vi.fn(),
-}))
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+      <a href={to}>{children}</a>
+    ),
+    useNavigate: () => vi.fn(),
+  }
+})
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
