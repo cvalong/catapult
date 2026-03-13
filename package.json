@@ -10,7 +10,11 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
+    "dev:cli": "tsup --watch",
+    "dev:api": "bun run --cwd template dev",
+    "dev:app": "bun run --cwd template/frontend/app dev",
+    "dev:marketing": "bun run --cwd template/frontend/marketing dev",
+    "dev": "concurrently --names \"api,app,marketing\" --prefix-colors \"blue,green,yellow\" \"bun run dev:api\" \"bun run dev:app\" \"bun run dev:marketing\"",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -26,6 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "concurrently": "^9.2.1",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^3.0.0"
