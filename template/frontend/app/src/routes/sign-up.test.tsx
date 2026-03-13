@@ -4,16 +4,19 @@ import { vi } from 'vitest'
 import { SignUpPage } from './sign-up'
 
 const mockNavigate = vi.fn()
+const mockSignUp = vi.hoisted(() => vi.fn().mockResolvedValue({ error: null }))
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
-  useNavigate: () => mockNavigate,
-  redirect: vi.fn(),
-}))
-
-const mockSignUp = vi.fn().mockResolvedValue({ error: null })
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+      <a href={to}>{children}</a>
+    ),
+    useNavigate: () => mockNavigate,
+    redirect: vi.fn(),
+  }
+})
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {

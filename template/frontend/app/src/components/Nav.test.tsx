@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 import { Nav } from './Nav'
 
 const mockNavigate = vi.fn()
+const mockSignOut = vi.hoisted(() => vi.fn().mockResolvedValue({}))
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
@@ -11,8 +12,6 @@ vi.mock('@tanstack/react-router', () => ({
   ),
   useNavigate: () => mockNavigate,
 }))
-
-const mockSignOut = vi.fn().mockResolvedValue({})
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
