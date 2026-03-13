@@ -1,19 +1,36 @@
-import { Hono } from 'hono'
-import { logger } from 'hono/logger'
-import { auth } from './lib/auth.js'
-import billing from './routes/billing.js'
-import licenses from './routes/licenses.js'
+import { intro, outro, text, isCancel, cancel } from '@clack/prompts'
+import { join } from 'node:path'
+import { scaffold } from './lib/scaffold.js'
 
-const app = new Hono()
+async function main() {
+  intro('Catapult')
 
-app.use(logger())
+  // 1. Project name
+  const rawName = await text({
+    message: 'Project name',
+    placeholder: 'my-app',
+    defaultValue: 'my-app',
+    validate(value) {
+      if (!value.trim()) return 'Project name is required.'
+    },
+  })
 
-app.on(['GET', 'POST'], '/api/auth/**', (ctx) => auth.handler(ctx.req.raw))
-app.route('/api/billing', billing)
-app.route('/api/licenses', licenses)
+  if (isCancel(rawName)) {
+    cancel('Setup cancelled.')
+    process.exit(0)
+  }
 
-app.get('/health', (ctx) => ctx.json({ ok: true }))
+  const appName = rawName.trim()
+  const projectDir = join(process.cwd(), appName)
 
-export default app
+  // 2. Scaffold project (copies bundled template + replaces __APP_NAME__)
+  await scaffold(projectDir, appName)
 
-Bun.serve({ fetch: app.fetch, port: Number(process.env.PORT ?? 3000) })
+  // 3. Done
+  outro(`Your app is ready.\n\nNext steps:\n  cd ${appName}\n  bun dev`)
+}
+
+main().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
