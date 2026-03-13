@@ -1,8 +1,10 @@
 import { intro, outro, text, isCancel, cancel } from '@clack/prompts'
 import { join } from 'node:path'
 import { scaffold } from './lib/scaffold.js'
+import { checkRequirements } from './lib/check-requirements.js'
 
 async function main() {
+  checkRequirements()
   intro('Catapult')
 
   // 1. Project name
