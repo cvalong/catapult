@@ -26,7 +26,7 @@ billing.post('/kit-checkout', async (ctx) => {
 billing.post('/checkout', requireAuth, async (ctx) => {
   const currentUser = ctx.get('user')
 
-  let customerId = (currentUser as any).stripeCustomerId as string | null
+  let customerId = currentUser.stripeCustomerId
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: currentUser.email,
@@ -49,7 +49,7 @@ billing.post('/checkout', requireAuth, async (ctx) => {
 
 billing.post('/portal', requireAuth, async (ctx) => {
   const currentUser = ctx.get('user')
-  const customerId = (currentUser as any).stripeCustomerId as string | null
+  const customerId = currentUser.stripeCustomerId
 
   if (!customerId) return ctx.json({ error: 'No billing account found' }, 400)
 
