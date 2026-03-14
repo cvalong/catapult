@@ -35,11 +35,64 @@ npx create-catapult@latest
 
 ## Quickstart
 
+### 1. Scaffold your project
+
 ```bash
 npx create-catapult@latest
 ```
 
 Follow the prompts to name your project. The CLI scaffolds everything and installs dependencies.
+
+### 2. Set up your environment
+
+```bash
+cd my-app
+cp .env.example .env
+```
+
+Fill in the required values in `.env`:
+
+| Variable | Where to get it |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string (e.g. `postgres://user:pass@localhost:5432/myapp`) |
+| `BETTER_AUTH_SECRET` | Any random string — `openssl rand -base64 32` works |
+| `BETTER_AUTH_URL` | Your backend URL (default: `http://localhost:3000`) |
+| `CORS_ORIGIN` | Your frontend URL (default: `http://localhost:5173`) |
+| `RESEND_API_KEY` | [resend.com](https://resend.com) → API Keys |
+| `EMAIL_FROM` | Verified sender address in Resend |
+| `STRIPE_SECRET_KEY` | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → API keys |
+| `STRIPE_WEBHOOK_SECRET` | Run `stripe listen` locally, or add an endpoint in Stripe Dashboard |
+| `STRIPE_PRICE_ID` | Stripe Dashboard → Products → your subscription price ID |
+| `STRIPE_KIT_PRICE_ID` | Stripe Dashboard → Products → your one-time kit price ID (optional) |
+| `TEMPLATE_DOWNLOAD_URL` | URL to a zip of your template files (e.g. a GitHub release asset) |
+
+### 3. Run the database migration
+
+```bash
+bun run db:push
+```
+
+### 4. Start the dev server
+
+```bash
+bun run dev
+```
+
+The backend starts on `http://localhost:3000`. Start the frontend separately:
+
+```bash
+# React app
+cd frontend/app && bun run dev
+
+# Marketing site
+cd frontend/marketing && bun run dev
+```
+
+### 5. Run tests
+
+```bash
+bun run test
+```
 
 ## Project Structure
 
