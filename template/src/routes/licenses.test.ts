@@ -50,6 +50,9 @@ describe('licenses route', () => {
   })
 
   it('returns { valid: true, downloadUrl } when active and calls db.update', async () => {
+    // NOTE: env mutation — clean up after to avoid bleeding into other tests
+    const originalUrl = process.env.TEMPLATE_DOWNLOAD_URL
+    process.env.TEMPLATE_DOWNLOAD_URL = 'https://example.com/download'
     mockFindFirst.mockResolvedValue({ key: 'CTPLT-0000-0000-0000-0000', revokedAt: null, activations: 0 })
     mockUpdateWhere.mockResolvedValue(undefined)
     const res = await app.request('/validate?key=CTPLT-0000-0000-0000-0000')
@@ -57,5 +60,6 @@ describe('licenses route', () => {
     expect(body.valid).toBe(true)
     expect(body.downloadUrl).toBeDefined()
     expect(mockUpdateChain.set).toHaveBeenCalled()
+    process.env.TEMPLATE_DOWNLOAD_URL = originalUrl
   })
 })
