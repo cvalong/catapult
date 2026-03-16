@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, mock, beforeEach } from 'bun:test'
 import { Hono } from 'hono'
 
-const mockFindFirst = vi.fn()
-const mockUpdateWhere = vi.fn()
-const mockUpdateChain = { set: vi.fn(() => ({ where: mockUpdateWhere })) }
+const mockFindFirst = mock()
+const mockUpdateWhere = mock()
+const mockUpdateChain = { set: mock(() => ({ where: mockUpdateWhere })) }
 
-vi.mock('../db/index', () => ({
+mock.module('../db/index', () => ({
   db: {
     query: {
       licenses: {
         findFirst: mockFindFirst,
       },
     },
-    update: vi.fn(() => mockUpdateChain),
+    update: mock(() => mockUpdateChain),
   },
 }))
 

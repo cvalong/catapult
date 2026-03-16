@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, mock, beforeEach } from 'bun:test'
 import { Hono } from 'hono'
 
-const mockDbWhere = vi.fn()
-const mockDbSet = vi.fn(() => ({ where: mockDbWhere }))
-const mockDeleteWhere = vi.fn()
+const mockDbWhere = mock()
+const mockDbSet = mock(() => ({ where: mockDbWhere }))
+const mockDeleteWhere = mock()
 
-vi.mock('../db/index', () => ({
+mock.module('../db/index', () => ({
   db: {
-    update: vi.fn(() => ({ set: mockDbSet })),
-    delete: vi.fn(() => ({ where: mockDeleteWhere })),
+    update: mock(() => ({ set: mockDbSet })),
+    delete: mock(() => ({ where: mockDeleteWhere })),
   },
 }))
 
@@ -20,8 +20,8 @@ const mockUser = {
   stripeCustomerId: null,
 }
 
-vi.mock('../lib/auth-middleware', () => ({
-  requireAuth: vi.fn(async (c: any, next: any) => {
+mock.module('../lib/auth-middleware', () => ({
+  requireAuth: mock(async (c: any, next: any) => {
     c.set('user', mockUser)
     await next()
   }),

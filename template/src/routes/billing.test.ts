@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, mock, beforeEach } from 'bun:test'
 import { Hono } from 'hono'
 
 const defaultUser = {
@@ -9,26 +9,26 @@ const defaultUser = {
   stripeCustomerId: null as string | null,
 }
 
-const mockRequireAuth = vi.fn(async (c: any, next: any) => {
+const mockRequireAuth = mock(async (c: any, next: any) => {
   c.set('user', { ...defaultUser })
   await next()
 })
 
-const mockCheckoutCreate = vi.fn()
-const mockCustomersCreate = vi.fn()
-const mockPortalCreate = vi.fn()
-const mockConstructEvent = vi.fn()
+const mockCheckoutCreate = mock()
+const mockCustomersCreate = mock()
+const mockPortalCreate = mock()
+const mockConstructEvent = mock()
 
-const mockDbWhere = vi.fn()
-const mockDbSet = vi.fn(() => ({ where: mockDbWhere }))
-const mockDbUpdate = vi.fn(() => ({ set: mockDbSet }))
-const mockInsertValues = vi.fn()
-const mockDbInsert = vi.fn(() => ({ values: mockInsertValues }))
+const mockDbWhere = mock()
+const mockDbSet = mock(() => ({ where: mockDbWhere }))
+const mockDbUpdate = mock(() => ({ set: mockDbSet }))
+const mockInsertValues = mock()
+const mockDbInsert = mock(() => ({ values: mockInsertValues }))
 
-const mockSendEmail = vi.fn()
+const mockSendEmail = mock()
 
-vi.mock('../lib/auth-middleware', () => ({ requireAuth: mockRequireAuth }))
-vi.mock('../lib/stripe', () => ({
+mock.module('../lib/auth-middleware', () => ({ requireAuth: mockRequireAuth }))
+mock.module('../lib/stripe', () => ({
   stripe: {
     checkout: { sessions: { create: mockCheckoutCreate } },
     customers: { create: mockCustomersCreate },
@@ -36,8 +36,8 @@ vi.mock('../lib/stripe', () => ({
     webhooks: { constructEvent: mockConstructEvent },
   },
 }))
-vi.mock('../db/index', () => ({ db: { update: mockDbUpdate, insert: mockDbInsert } }))
-vi.mock('../lib/email', () => ({ sendEmail: mockSendEmail }))
+mock.module('../db/index', () => ({ db: { update: mockDbUpdate, insert: mockDbInsert } }))
+mock.module('../lib/email', () => ({ sendEmail: mockSendEmail }))
 
 const { default: billing } = await import('./billing')
 

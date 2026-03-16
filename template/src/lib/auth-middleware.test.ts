@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, mock, beforeEach } from 'bun:test'
 import { Hono } from 'hono'
 
-const mockGetSession = vi.fn()
-vi.mock('./auth', () => ({
+const mockGetSession = mock()
+mock.module('./auth', () => ({
   auth: { api: { getSession: mockGetSession } },
 }))
 
