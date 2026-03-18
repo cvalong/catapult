@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",
+    "test": "bun test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -19,7 +20,8 @@
     "postgres": "^3.4.0",
     "better-auth": "^1.2.0",
     "resend": "^4.0.0",
-    "stripe": "^17.0.0"
+    "stripe": "^17.0.0",
+    "hono-rate-limiter": "^0.5.0"
   },
   "devDependencies": {
     "bun-types": "latest",
