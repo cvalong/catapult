@@ -50,11 +50,19 @@ cd my-app
 cp .env.example .env
 ```
 
-Fill in the required values in `.env`:
+Start the local database (requires Docker):
+
+```bash
+bun run docker:up
+```
+
+This starts a PostgreSQL container on port 5432. The default `DATABASE_URL` in `.env.example` already points to it — no changes needed for local dev.
+
+Fill in the remaining values in `.env`:
 
 | Variable | Where to get it |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string (e.g. `postgres://user:pass@localhost:5432/myapp`) |
+| `DATABASE_URL` | Pre-filled for local Docker (`postgres://postgres:postgres@localhost:5432/app`) |
 | `BETTER_AUTH_SECRET` | Any random string — `openssl rand -base64 32` works |
 | `BETTER_AUTH_URL` | Your backend URL (default: `http://localhost:3000`) |
 | `CORS_ORIGIN` | Your frontend URL (default: `http://localhost:5173`) |
@@ -94,6 +102,17 @@ cd frontend/marketing && bun run dev
 bun run test
 ```
 
+## Deploy
+
+The scaffolded app includes a `Dockerfile` for production deployments. Build and run it with:
+
+```bash
+docker build -t my-app .
+docker run -p 3000:3000 --env-file .env my-app
+```
+
+Deploy to any platform that accepts a Docker image (Railway, Fly.io, Render, etc.) and set your production environment variables there.
+
 ## Project Structure
 
 ```
@@ -115,6 +134,7 @@ my-app/
 │   ├── app/              # React 19 SPA
 │   └── marketing/        # Astro marketing site
 ├── Dockerfile
+├── docker-compose.yml
 ├── drizzle.config.ts
 └── .env.example
 ```
